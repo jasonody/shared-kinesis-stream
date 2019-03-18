@@ -4,9 +4,10 @@
   "description": "Sharing an AWS Kinesis stream across multiple Serverless stacks",
   "main": "handler.js",
   "scripts": {
-    "install": "cd core && npm i cd ../producer-service && npm i && cd ../consumer-service && npm i & cd ..",
+    "install": "cd producer-service && npm i && cd ../consumer-service && npm i && cd ..",
     "deploy": "cd core && echo Deploying Core && sls deploy -v && cd ../producer-service && echo Deploying Produce Service && sls deploy -v && cd ../consumer-service && echo Deploying Consumer Service && sls deploy -v && cd ..",
-    "remove": "cd consumer-service && echo Removing Consumer Service && sls remove -v && cd ../producer-service && echo Removing Producer Service && sls remove -v && cd ../core && echo Removing Core && sls remove -v && cd .."
+    "remove": "cd consumer-service && echo Removing Consumer Service && sls remove -v && cd ../producer-service && echo Removing Producer Service && sls remove -v && cd ../core && echo Removing Core && sls remove -v && cd ..",
+    "create-event": "cd producer-service && sls invoke -f producer && cd .."
   },
   "repository": {
     "type": "git",
