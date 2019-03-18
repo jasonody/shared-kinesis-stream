@@ -1,0 +1,36 @@
+service: shared-kinesis-stream-core
+
+provider:
+  name: aws
+  description: Sharing an AWS Kinesis stream across multiple Serverless stacs
+  tags:
+    vertical: shared-kineis-stream
+    service: core
+  region: ${opt:region, 'us-east-1'}
+  stage: ${opt:stage, 'dev'}
+  runtime: nodejs8.10
+  size: 128
+
+resources:
+  Resources:
+    SharedStream:
+      Type: AWS::Kinesis::Stream
+      Properties:
+        Name: ${self:provider.stage}-${self:service}-shared-stream
+        RetentionPeriodHours: 24
+        ShardCount: 1
+
+  Outputs:
+    streamName:
+      Value:
+        Ref: SharedStream
+      Export:
+        Name: ${self:provider.stage}-${self:service}-shared-stream-name
+
+    streamArn:
+      Value:
+        Fn::GetAtt:
+          - SharedStream
+          - Arn
+      Export:
+        Name: ${self:provider.stage}-${self:service}-shared-stream-arn

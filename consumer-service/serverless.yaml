@@ -1,0 +1,32 @@
+service: shared-kinesis-stream-consumer-service
+
+provider:
+  name: aws
+  description: Sharing an AWS Kinesis stream across multiple Serverless stacs
+  tags:
+    vertical: shared-kineis-stream
+    service: consumer-service
+  region: ${opt:region, 'us-east-1'}
+  stage: ${opt:stage, 'dev'}
+  runtime: nodejs8.10
+  size: 128
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - kinesis:PutRecord
+      Resource:
+        'Fn::ImportValue': ${self:provider.stage}-${self:custom.coreServiceName}-shared-stream-arn
+
+custom:
+  coreServiceName: shared-kinesis-stream-core
+
+functions:
+  consumer:
+    handler: handler.consumer
+    events:
+      - stream:
+          type: kinesis
+          arn:
+            'Fn::ImportValue': ${self:provider.stage}-${self:custom.coreServiceName}-shared-stream-arn
+          batchSize: 100
+          startingPosition: LATEST

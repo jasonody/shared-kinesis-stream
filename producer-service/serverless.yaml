@@ -1,0 +1,28 @@
+service: shared-kinesis-stream-producer-service
+
+provider:
+  name: aws
+  description: Sharing an AWS Kinesis stream across multiple Serverless stacs
+  tags:
+    vertical: shared-kineis-stream
+    service: producer-service
+  region: ${opt:region, 'us-east-1'}
+  stage: ${opt:stage, 'dev'}
+  runtime: nodejs8.10
+  size: 128
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - kinesis:PutRecord
+      Resource:
+        'Fn::ImportValue': ${self:provider.stage}-${self:custom.coreServiceName}-shared-stream-arn
+
+custom:
+  coreServiceName: shared-kinesis-stream-core
+
+functions:
+  producer:
+    handler: handler.producer
+    environment:
+      STREAM_NAME: 
+        'Fn::ImportValue': ${self:provider.stage}-${self:custom.coreServiceName}-shared-stream-name
